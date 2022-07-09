@@ -4,6 +4,11 @@ import (
 	"testing"
 )
 
+type testScenario struct {
+	input   string
+	outcome []string
+}
+
 const testBlob1 = `import React from 'react';
 import styled from '@emotion/styled';
 import {css} from '@emotion/react';
@@ -19,11 +24,6 @@ function testingNameOfVariable(){`
 
 func TestFindVariableNames(t *testing.T) {
 
-	type testScenario struct {
-		input   string
-		outcome []string
-	}
-
 	var testScenarios = []testScenario{
 		testScenario{testBlob1, []string{"testVariable", "Background"}},
 	}
@@ -32,6 +32,22 @@ func TestFindVariableNames(t *testing.T) {
 		result := GetVariableNames(testSuite.input)
 		if !containsEvery(result, testSuite.outcome) {
 			t.Error("expected for testing input: ", testSuite.input, ",to find all declarations: ", testSuite.outcome)
+		}
+	}
+}
+
+func TestCamelCaseToWords(t *testing.T) {
+	var testScenarios = []testScenario{
+		testScenario{"test", []string{"test"}},
+		testScenario{"testVariable", []string{"test", "variable"}},
+		testScenario{"TestVariable", []string{"test", "variable"}},
+		testScenario{"TestVariableSuffix", []string{"test", "variable", "suffix"}},
+	}
+
+	for _, testSuite := range testScenarios {
+		result := CamelCaseToWords(testSuite.input)
+		if !containsEvery(result, testSuite.outcome) {
+			t.Error("expected for testing input: ", testSuite.input, ",to find all words: ", testSuite.outcome)
 		}
 	}
 }

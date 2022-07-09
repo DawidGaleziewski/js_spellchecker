@@ -19,7 +19,7 @@ func main() {
 	fmt.Println(inputBlob)
 }
 
-//getVariableNames accepts string and returns variable declarations in javascript if there are any
+// GetVariableNames accepts string and returns variable declarations in javascript if there are any
 func GetVariableNames(textBlob string) []string {
 	r := regexp.MustCompile("(const) ([^ \n]*)")
 	captureGroups := r.FindAllStringSubmatch(textBlob, -1)
@@ -35,4 +35,9 @@ func GetVariableNames(textBlob string) []string {
 	}
 
 	return variableNames
+}
+
+// CamelCaseToWords converts string written in cammel case to slice of strings with words
+func CamelCaseToWords(variableName string) []string {
+	return []string{"test", "test"}
 }
