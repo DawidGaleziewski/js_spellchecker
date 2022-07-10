@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -39,6 +40,7 @@ func TestFindVariableNames(t *testing.T) {
 func TestCamelCaseToWords(t *testing.T) {
 	var testScenarios = []testScenario{
 		testScenario{"test", []string{"test"}},
+		testScenario{"Test", []string{"test"}},
 		testScenario{"testVariable", []string{"test", "variable"}},
 		testScenario{"TestVariable", []string{"test", "variable"}},
 		testScenario{"TestVariableSuffix", []string{"test", "variable", "suffix"}},
@@ -46,8 +48,9 @@ func TestCamelCaseToWords(t *testing.T) {
 
 	for _, testSuite := range testScenarios {
 		result := CamelCaseToWords(testSuite.input)
+		fmt.Println("#found words", result)
 		if !containsEvery(result, testSuite.outcome) {
-			t.Error("expected for testing input: ", testSuite.input, ",to find all words: ", testSuite.outcome)
+			t.Error("expected for testing input: ", testSuite.input, ",to find all words: ", testSuite.outcome, "Found only: ", result)
 		}
 	}
 }
