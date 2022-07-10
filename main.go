@@ -39,5 +39,11 @@ func GetVariableNames(textBlob string) []string {
 
 // CamelCaseToWords converts string written in cammel case to slice of strings with words
 func CamelCaseToWords(variableName string) []string {
+	r := regexp.MustCompile("[A-Z]")
+	indexGroups := r.FindAllStringIndex(variableName, -1)
+	for newWordIndex := range indexGroups {
+
+	}
+
 	return []string{"test", "test"}
 }
