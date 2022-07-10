@@ -58,6 +58,13 @@ func CamelCaseToWords(variableName string) []string {
 	}
 
 	var words []string
+
+	startsWithLowerCase := wordStartIndexes[0] != 0
+	if startsWithLowerCase {
+		word := variableName[0:wordStartIndexes[0]]
+		words = append(words, strings.ToLower(word))
+	}
+
 	for i, startIndex := range wordStartIndexes {
 		var word string
 		var isLastFoundIndex = i+1 == len(wordStartIndexes)
