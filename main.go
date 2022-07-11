@@ -1,7 +1,9 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"os"
 	"regexp"
@@ -41,13 +43,20 @@ func SuggestWord(word string) string {
 }
 
 func IsEnglishWord(searchTerm string) {
-	englishWordsDictionary, err := os.Open("./assets/words_dictionary.json")
+	jsonFile, err := os.Open("./assets/words_dictionary.json")
 	if err != nil {
 		log.Println(err)
 	}
-	defer englishWordsDictionary.Close()
+	defer jsonFile.Close()
 
-	fmt.Print(word)
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var englishWordsDictionary map[string]string
+
+	json.Unmarshal([]byte(byteValue), &englishWordsDictionary)
+
+	if _, ok := englishWordsDictionary[searchTerm]; ok {
+		fmt.Println("has word")
+	}
 }
 
 // GetVariableNames accepts string and returns variable declarations in javascript if there are any
