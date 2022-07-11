@@ -6,6 +6,8 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/sajari/fuzzy"
 )
 
 func main() {
@@ -17,7 +19,35 @@ func main() {
 
 	inputBlob := os.Args[1]
 
-	fmt.Println(inputBlob)
+	IsEnglishWord(inputBlob)
+	// fmt.Println()
+}
+
+func SuggestWord(word string) string {
+	model := fuzzy.NewModel()
+
+	// For testing only, this is not advisable on production
+	model.SetThreshold(1)
+
+	// This expands the distance searched, but costs more resources (memory and time).
+	// For spell checking, "2" is typically enough, for query suggestions this can be higher
+	model.SetDepth(5)
+
+	// Train multiple words simultaneously by passing an array of strings to the "Train" function
+	words := []string{"bob", "your", "uncle", "dynamite", "delicate", "biggest", "big", "bigger", "aunty", "you're"}
+	model.Train(words)
+
+	return model.SpellCheck(word)
+}
+
+func IsEnglishWord(searchTerm string) {
+	englishWordsDictionary, err := os.Open("./assets/words_dictionary.json")
+	if err != nil {
+		log.Println(err)
+	}
+	defer englishWordsDictionary.Close()
+
+	fmt.Print(word)
 }
 
 // GetVariableNames accepts string and returns variable declarations in javascript if there are any
