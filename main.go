@@ -21,11 +21,16 @@ func main() {
 
 	inputBlob := os.Args[1]
 
-	IsEnglishWord(inputBlob)
-	// fmt.Println()
+	englishDictionary := getEnglishDictionary()
+
+	if _, ok := englishDictionary[inputBlob]; ok {
+		fmt.Println("has word")
+	} else {
+		fmt.Println("suggest", SuggestWord(inputBlob, englishDictionary))
+	}
 }
 
-func SuggestWord(word string) string {
+func SuggestWord(searchTerm string, dictionary map[string]string) string {
 	model := fuzzy.NewModel()
 
 	// For testing only, this is not advisable on production
@@ -33,16 +38,23 @@ func SuggestWord(word string) string {
 
 	// This expands the distance searched, but costs more resources (memory and time).
 	// For spell checking, "2" is typically enough, for query suggestions this can be higher
-	model.SetDepth(5)
+	model.SetDepth(2)
 
 	// Train multiple words simultaneously by passing an array of strings to the "Train" function
-	words := []string{"bob", "your", "uncle", "dynamite", "delicate", "biggest", "big", "bigger", "aunty", "you're"}
+
+	var words []string
+
+	for key, _ := range dictionary {
+		words = append(words, key)
+	}
+
+	// TODO: this is the most resource heavy task. Need to at leas run this before suggesting each word and maybe decrese the number of dictionary words
 	model.Train(words)
 
-	return model.SpellCheck(word)
+	return model.SpellCheck(searchTerm)
 }
 
-func IsEnglishWord(searchTerm string) {
+func getEnglishDictionary() map[string]string {
 	jsonFile, err := os.Open("./assets/words_dictionary.json")
 	if err != nil {
 		log.Println(err)
@@ -53,10 +65,7 @@ func IsEnglishWord(searchTerm string) {
 	var englishWordsDictionary map[string]string
 
 	json.Unmarshal([]byte(byteValue), &englishWordsDictionary)
-
-	if _, ok := englishWordsDictionary[searchTerm]; ok {
-		fmt.Println("has word")
-	}
+	return englishWordsDictionary
 }
 
 // GetVariableNames accepts string and returns variable declarations in javascript if there are any
