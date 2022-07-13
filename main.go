@@ -12,24 +12,44 @@ import (
 	"github.com/sajari/fuzzy"
 )
 
-func main() {
+const helpText = `
+spellchecker v0.0.1
 
+# arguments:
+- model [path to json file with words] - train spellcheck on provided words in json file
+`
+
+func main() {
 	if len(os.Args) == 1 {
-		log.Println("No argument provided")
+		fmt.Println(helpText)
 		return
 	}
 
-	inputBlob := os.Args[1]
+	firstParam := os.Args[1]
 
-	englishDictionary := getEnglishDictionary()
-
-	if _, ok := englishDictionary[inputBlob]; ok {
-		fmt.Println("has word")
-	} else {
-		fmt.Println("suggest", SuggestWord(inputBlob, englishDictionary))
+	switch firstParam {
+	case "model":
+		dictionaryJSONPath := os.Args[2]
+		GenerateFuzzyModel(dictionaryJSONPath, "assets/fuzzy_model.go")
+	case "js":
+		codeTextForSpellCheck := os.Args[2]
+		fmt.Println(SpellCheckJavaScriptVariables(codeTextForSpellCheck, "assets/fuzzy_model.json"))
+	default:
+		fmt.Println(helpText)
 	}
 }
 
+func SpellCheckJavaScriptVariables(code string, trainedModelPath string) string {
+	// TODO: this is the most resource heavy task. Need to at leas run this before suggesting each word and maybe decrese the number of dictionary words
+	model, err := fuzzy.Load(trainedModelPath)
+	if err != nil {
+		log.Println(err)
+	}
+
+	return model.SpellCheck(code)
+}
+
+// SuggestWord is a live checkup that takes dictionary and trains the model in runtime. It is quite costly
 func SuggestWord(searchTerm string, dictionary map[string]string) string {
 	model := fuzzy.NewModel()
 
@@ -54,18 +74,43 @@ func SuggestWord(searchTerm string, dictionary map[string]string) string {
 	return model.SpellCheck(searchTerm)
 }
 
-func getEnglishDictionary() map[string]string {
-	jsonFile, err := os.Open("./assets/words_dictionary.json")
+// Generate a fuzzy model for spell checking and saves it for later use
+func GenerateFuzzyModel(wordsDictJsonPath string, outputPath string) {
+	// load and parse json
+	jsonFile, err := os.Open(wordsDictJsonPath)
 	if err != nil {
 		log.Println(err)
 	}
 	defer jsonFile.Close()
+	byteValue, err := ioutil.ReadAll(jsonFile)
+	if err != nil {
+		log.Println(err)
+	}
 
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var englishWordsDictionary map[string]string
+	var dictionary map[string]string
+	json.Unmarshal([]byte(byteValue), &dictionary)
 
-	json.Unmarshal([]byte(byteValue), &englishWordsDictionary)
-	return englishWordsDictionary
+	// train model on provided values
+	model := fuzzy.NewModel()
+
+	// For testing only, this is not advisable on production
+	model.SetThreshold(1)
+
+	// This expands the distance searched, but costs more resources (memory and time).
+	// For spell checking, "2" is typically enough, for query suggestions this can be higher
+	model.SetDepth(2)
+
+	// Train multiple words simultaneously by passing an array of strings to the "Train" function
+	var words []string
+
+	for key, _ := range dictionary {
+		words = append(words, key)
+	}
+
+	// TODO: this is the most resource heavy task.
+	model.Train(words)
+
+	model.Save(outputPath)
 }
 
 // GetVariableNames accepts string and returns variable declarations in javascript if there are any
