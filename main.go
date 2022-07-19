@@ -38,6 +38,8 @@ func main() {
 	}
 }
 
+
+
 func SpellCheckJavaScriptVariables(code string, trainedModelPath string) string {
 	// TODO: this is the most resource heavy task. Need to at leas run this before suggesting each word and maybe decrese the number of dictionary words
 	model, err := fuzzy.Load(trainedModelPath)
