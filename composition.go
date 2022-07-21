@@ -33,16 +33,13 @@ type Suggestion struct{
     phrases []string;
 }
 
-
-
-
 // INTERFACES lV1
-type  DefinitionFinder interface{
-	FindDefinitions(code CodeBlob) []Definition
+type DefinitionFinder interface{
+	FindDefinitions(code CodeBlob, regexPattern string) []Definition
 }
 
-type WordFinder interface  {
-	FindWords(variableName string) []string
+type WordSpliter interface  {
+	SplitWords(variableName string, regexPattern string) []string
 }
 
 type WordChecker interface {
@@ -58,13 +55,13 @@ type PhraseSuggester interface {
 }
 
 // INTERFACES LV2
-type  Parser interface{
+type Parser interface{
 	Parse(string) []Definition
 }	
 
 type CodeParser struct {
 	DefinitionFinder
-	WordFinder
+	WordSpliter
 	Parser
 	definitions []Definition
 }
@@ -77,11 +74,16 @@ type CodeSuggester interface {
 
 // IMPLEMENTATION
 
-type JSDefFinder struct {}
+type Search struct {}
 
-func (JSDefFinder)FindDefinitions(code CodeBlob) []Definition{
 
-	r := regexp.MustCompile("(const) ([^ \n]*)")
+var DeclarationPattern = map[string]string{
+	"JS": "(const) ([^ \n]*)",
+}
+
+func (Search)FindDefinitions(code CodeBlob, regexPattern string) []Definition{
+
+	r := regexp.MustCompile(regexPattern)
 	captureGroups := r.FindAllStringSubmatch(code.blob, -1)
 	var definitions []Definition
 	//var variableNames []string
@@ -105,9 +107,12 @@ func (JSDefFinder)FindDefinitions(code CodeBlob) []Definition{
 	return definitions
 }
 
-type CamelCaseSplit struct {}
-func (CamelCaseSplit)FindWords(variableName string) []string{
-	r := regexp.MustCompile("[A-Z]")
+type Split struct {}
+var CaseNewWordPattern = map[string]string{
+	"CAMEL_CASE": "[A-Z]",
+}
+func (Split)SplitWords(variableName string, regexPattern string) []string{
+	r := regexp.MustCompile(regexPattern)
 	indexGroups := r.FindAllStringIndex(variableName, -1)
 
 	var wordStartIndexes []int
@@ -150,12 +155,12 @@ func (CamelCaseSplit)FindWords(variableName string) []string{
 	return words
 }
 
-type JSParser struct{}
+type Seaker struct{}
 func (CP CodeParser)ParseJS(codeBlob CodeBlob) []Definition {
-	definitions := CP.FindDefinitions(codeBlob);
+	definitions := CP.FindDefinitions(codeBlob, DeclarationPattern["JS"]);
 
 	for i, def := range definitions {
-		words := CP.FindWords(def.name);
+		words := CP.SplitWords(def.name, CaseNewWordPattern["CAMEL_CASE"]);
 		definitions[i].words = append(definitions[i].words, words...) 
 	}
 
@@ -167,8 +172,8 @@ func (CP CodeParser)ParseJS(codeBlob CodeBlob) []Definition {
 // Bootstraping all together
 func main(){
 	JS := CodeParser{
-		DefinitionFinder: JSDefFinder{},
-		WordFinder: CamelCaseSplit{},
+		DefinitionFinder: Search{},
+		WordSpliter: Split{},
 	}
 
 	definitions := JS.ParseJS(CodeBlob{blob: "const TestVariable1("})
