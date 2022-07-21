@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"regexp"
 	"strings"
 )
@@ -57,9 +58,15 @@ type PhraseSuggester interface {
 }
 
 // INTERFACES LV2
+type  Parser interface{
+	Parse(string) []Definition
+}	
+
 type CodeParser struct {
 	DefinitionFinder
 	WordFinder
+	Parser
+	definitions []Definition
 }
 
 type CodeSuggester interface {
@@ -72,10 +79,10 @@ type CodeSuggester interface {
 
 type JSDefFinder struct {}
 
-func (JSDefFinder)FindDefinition(code CodeBlob) []Definition{
+func (JSDefFinder)FindDefinitions(code CodeBlob) []Definition{
+
 	r := regexp.MustCompile("(const) ([^ \n]*)")
 	captureGroups := r.FindAllStringSubmatch(code.blob, -1)
-
 	var definitions []Definition
 	//var variableNames []string
 
@@ -98,8 +105,9 @@ func (JSDefFinder)FindDefinition(code CodeBlob) []Definition{
 	return definitions
 }
 
-func (JS)FindWords(variableName string) []string{
-		r := regexp.MustCompile("[A-Z]")
+type CamelCaseSplit struct {}
+func (CamelCaseSplit)FindWords(variableName string) []string{
+	r := regexp.MustCompile("[A-Z]")
 	indexGroups := r.FindAllStringIndex(variableName, -1)
 
 	var wordStartIndexes []int
@@ -142,13 +150,28 @@ func (JS)FindWords(variableName string) []string{
 	return words
 }
 
+type JSParser struct{}
+func (CP CodeParser)ParseJS(codeBlob CodeBlob) []Definition {
+	definitions := CP.FindDefinitions(codeBlob);
+
+	for i, def := range definitions {
+		words := CP.FindWords(def.name);
+		definitions[i].words = append(definitions[i].words, words...) 
+	}
+
+	return definitions
+}
 
 
 
 // Bootstraping all together
-func main_2(){
-	JSParser := CodeParser{
+func main(){
+	JS := CodeParser{
 		DefinitionFinder: JSDefFinder{},
-		WordFinder: JS{},
+		WordFinder: CamelCaseSplit{},
 	}
+
+	definitions := JS.ParseJS(CodeBlob{blob: "const TestVariable1("})
+	fmt.Println(definitions[0].words)
+
 }
