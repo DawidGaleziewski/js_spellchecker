@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"js_tools/spellchecker/model"
-	"log"
 	"os"
-
-	"github.com/sajari/fuzzy"
 )
 
 const helpText = `
@@ -32,20 +29,9 @@ func main() {
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
 		codeTextForSpellCheck := os.Args[2]
+		CodeParser
 		fmt.Println(SpellCheckJavaScriptVariables(codeTextForSpellCheck, defaultModelPath))
 	default:
 		fmt.Println(helpText)
 	}
-}
-
-
-
-func SpellCheckJavaScriptVariables(code string, trainedModelPath string) string {
-	// TODO: this is the most resource heavy task. Need to at leas run this before suggesting each word and maybe decrese the number of dictionary words
-	model, err := fuzzy.Load(trainedModelPath)
-	if err != nil {
-		log.Println(err)
-	}
-
-	return model.SpellCheck(code)
 }
