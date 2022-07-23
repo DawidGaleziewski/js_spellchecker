@@ -1,6 +1,10 @@
 package code_parser
 
 import (
+	"fmt"
+	"io/fs"
+	"log"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -27,6 +31,10 @@ type Definition struct {
 }
 
 // INTERFACES lV1
+type FileFinder interface {
+	FindFiles(dir string, regexPattern string) []string 
+}
+
 type DefinitionFinder interface{
 	FindDefinitions(code CodeBlob, regexPattern string) []Definition
 }
@@ -41,6 +49,7 @@ type Parser interface{
 }	
 
 type CodeParser struct {
+	FileFinder
 	DefinitionFinder
 	WordSpliter
 	Parser
@@ -52,6 +61,28 @@ type CodeParser struct {
 type Search struct {}
 var DeclarationPattern = map[string]string{
 	"JS": "(const) ([^ \n]*)",
+}
+
+var FilePattern = map[string]string {
+	"TS":  ".*\\.ts",
+}
+
+func (Search)FindFiles(dir string, regexPattern string) []string {
+	var filePaths []string 
+	filepath.Walk("./example", func(path string, info fs.FileInfo, err error) error {
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+			filePaths = append(filePaths, path)
+			fmt.Println(path)
+			
+			return nil
+		})
+
+	jsFilePaths := filterByRegex(filePaths, regexPattern)
+	fmt.Println(jsFilePaths)
+	return jsFilePaths
 }
 
 func (Search)FindDefinitions(code CodeBlob, regexPattern string) []Definition{
@@ -145,10 +176,28 @@ var Toolbox = CodeParser{
 
 
 // Bootstraping all together
-// func main(){
+// func Parse(){
 
 	
 // 	definitions := JS.ParseJS(CodeBlob{blob: "const TestVariable1("})
 // 	fmt.Println(definitions[0].words)
 
 // }
+
+
+// utils
+func filterByRegex (arr []string, regexPattern string) []string {
+	var results []string;
+
+	for _, item := range arr {
+		doesMatch, err := regexp.MatchString(regexPattern, item)
+		if err != nil {
+			log.Println(err)
+		}
+		if(doesMatch){
+			results = append(results, item)
+		}
+	}
+
+	return results
+}
