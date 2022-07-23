@@ -28,9 +28,9 @@ func main() {
 		dictionaryJSONPath := os.Args[2]
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
-		codeTextForSpellCheck := os.Args[2]
-		CodeParser
-		fmt.Println(SpellCheckJavaScriptVariables(codeTextForSpellCheck, defaultModelPath))
+		// codeTextForSpellCheck := os.Args[2]
+		// CP := code_parser.CodeParser{}
+		// CP.Search
 	default:
 		fmt.Println(helpText)
 	}

@@ -1,4 +1,4 @@
-package main
+package dictionary
 
 // INTERFACES lV1
 type WordChecker interface {
