@@ -1,0 +1,30 @@
+import { Meta, Story, Preview, Canvas } from "@storybook/addon-docs/blocks";
+import { Background } from "../../utils/Background";
+import { Button } from "./Button";
+
+<Meta title="Buttons" component={Button} />
+
+# Buttons
+
+Buttons for project
+
+## Usage
+
+Buttons are used to trigger internal actions within your web application
+
+<Preview withToolbar>
+  <Story name="primary">
+    <Button variant="primary">Send form</Button>
+  </Story>
+  <Story name="secondary">
+    <Background variant="dark">
+      <Button variant="secondary">Send form</Button>
+    </Background>
+  </Story>
+  <Story name="form primary">
+    <Button variant="form-primary">Send form</Button>
+  </Story>
+  <Story name="form secondary">
+    <Button variant="form-secondary">Send form</Button>
+  </Story>
+</Preview>

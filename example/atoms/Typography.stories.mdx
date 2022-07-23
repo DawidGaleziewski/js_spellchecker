@@ -1,0 +1,45 @@
+import { Meta, Story, Preview, Canvas } from "@storybook/addon-docs/blocks";
+import { Background } from "../../utils/Background";
+import { Typography, TypographyVariant } from "./Typography";
+import {Table} from "../molecules/Table.tsx";
+
+<Meta title="Typography" component={Typography} />
+
+# Typography
+
+Abstraction for text
+
+## Usage
+
+Children will have a tag and text style specific for a typography
+
+<Preview withToolbar>
+  <Story name="All">
+    <Table>
+      <Table.Row>
+        <Table.Cell>
+           <Typography variant="main-header">Main-header</Typography>
+        </Table.Cell>
+        <Table.Cell>
+           <Typography variant="main-header">The greatest glory</Typography>
+        </Table.Cell>
+      </Table.Row>
+     
+     <Table.Row>
+        <Table.Cell>
+          <Typography variant="section-header">Section-header</Typography>
+        </Table.Cell>
+     </Table.Row>
+
+
+      <Typography variant={TypographyVariant.SUB_HEADER}>Sub-header</Typography>
+      <Typography variant={TypographyVariant.BUTTON_TEXT}>Button text</Typography>
+      <br />
+      <Typography variant={TypographyVariant.MOBILE_MENU}>Mobile menu</Typography>
+      <br />
+      <Typography variant={TypographyVariant.LIST}>List</Typography>
+      <Typography variant={TypographyVariant.LINK}>Link</Typography>
+      <Typography variant={TypographyVariant.PARAGRAPH}>The greatest glory in living lies not in never falling, but in rising every time we fall.</Typography>
+    </Table>
+  </Story>
+</Preview>

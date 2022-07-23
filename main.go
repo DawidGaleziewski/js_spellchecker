@@ -2,8 +2,11 @@ package main
 
 import (
 	"fmt"
+	"io/fs"
 	"js_tools/spellchecker/model"
+	"log"
 	"os"
+	"path/filepath"
 )
 
 const helpText = `
@@ -28,10 +31,33 @@ func main() {
 		dictionaryJSONPath := os.Args[2]
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
+		var filePaths []string 
+		err := filepath.Walk("./example", func(path string, info fs.FileInfo, err error) error {
+			if err != nil {
+				log.Println(err)
+				return err
+			}
+			filePaths = append(filePaths, path)
+			fmt.Println(path)
+			
+			return nil
+		})
+
+		
 		// codeTextForSpellCheck := os.Args[2]
 		// CP := code_parser.CodeParser{}
 		// CP.Search
 	default:
 		fmt.Println(helpText)
 	}
+}
+
+func filterByRegex (arr []string, regexPattern string) []string {
+	var results []string;
+
+	for _, item := range arr {
+
+	}
+
+	return results
 }
