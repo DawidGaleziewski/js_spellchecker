@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 )
 
 const helpText = `
@@ -32,7 +33,7 @@ func main() {
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
 		var filePaths []string 
-		err := filepath.Walk("./example", func(path string, info fs.FileInfo, err error) error {
+		filepath.Walk("./example", func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
 				log.Println(err)
 				return err
@@ -43,7 +44,8 @@ func main() {
 			return nil
 		})
 
-		
+		 jsFilePaths := filterByRegex(filePaths, ".*ts")
+		 fmt.Println(jsFilePaths)
 		// codeTextForSpellCheck := os.Args[2]
 		// CP := code_parser.CodeParser{}
 		// CP.Search
@@ -56,7 +58,13 @@ func filterByRegex (arr []string, regexPattern string) []string {
 	var results []string;
 
 	for _, item := range arr {
-
+		doesMatch, err := regexp.MatchString(regexPattern, item)
+		if err != nil {
+			log.Println(err)
+		}
+		if(doesMatch){
+			results = append(results, item)
+		}
 	}
 
 	return results
