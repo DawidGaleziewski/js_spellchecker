@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"js_tools/spellchecker/code_parser"
+	"js_tools/spellchecker/dictionary"
 	"js_tools/spellchecker/model"
 	"os"
 )
@@ -15,6 +16,7 @@ spellchecker v0.0.1
 `
 
 const defaultModelPath = "assets/fuzzy_model.go"
+
 
 func main() {
 	if len(os.Args) == 1 {
@@ -30,7 +32,11 @@ func main() {
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
 		checkDirPath := os.Args[2]
-		code_parser.ParseJavaScript(checkDirPath)
+		definitions := code_parser.ParseJavaScript(checkDirPath)
+		suggestions := dictionary.SuggestEnglish(definitions)
+		for _, sug := range suggestions {
+			fmt.Println(sug.IncorrectWords)
+		}
 		// CP := &code_parser.CodeParser{}
 		// CP.FindDefinitions(code_parser.CodeBlob{}, "JS")
 		// filesFound := CP.FindFiles("../example", ".*\\.ts")

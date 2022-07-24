@@ -28,7 +28,7 @@ type Origin struct{
 type Definition struct {
     Origin;
     name string;
-    words []string;
+    Words []string;
 }
 
 // INTERFACES lV1
@@ -69,7 +69,6 @@ var FilePattern = map[string]string {
 }
 
 func (Search)FindFiles(dir string, regexPattern string) []string {
-	fmt.Println("From find files func")
 	var filePaths []string 
 	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
@@ -83,7 +82,6 @@ func (Search)FindFiles(dir string, regexPattern string) []string {
 		})
 
 	jsFilePaths := filterByRegex(filePaths, regexPattern)
-	fmt.Println(jsFilePaths)
 	return jsFilePaths
 }
 
@@ -101,7 +99,7 @@ func (Search)FindDefinitions(code CodeBlob, regexPattern string, splitWordsFN fu
 		definition := Definition{
 			name: variableName,
 			Origin: code.Origin,
-			words: splitWordsFN(variableName),
+			Words: splitWordsFN(variableName),
 		}
 
 		definitions = append(definitions, definition)
@@ -165,9 +163,7 @@ var Toolbox = CodeParser{
 		WordSpliter: Split{},
 	}
 
-
-// Bootstraping all together
-func ParseJavaScript(dir string){
+func ParseJavaScript(dir string)[]Definition{
 	var definitions []Definition
 	filePaths := Toolbox.FindFiles(dir, FilePattern["TS"]);
 
@@ -183,7 +179,7 @@ func ParseJavaScript(dir string){
 		definitions = append(definitions, def...)
 	}
 
-	fmt.Println(definitions)
+	return definitions
 }
 
 
