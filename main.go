@@ -30,9 +30,11 @@ func main() {
 		model.Learn(dictionaryJSONPath, defaultModelPath)
 	case "js":
 		checkDirPath := os.Args[2]
-		CP := code_parser.CodeParser{}
-		filesFound := CP.FindFiles(checkDirPath,  ".*\\.ts")
-		fmt.Println("checking files:", filesFound)
+		code_parser.ParseJavaScript(checkDirPath)
+		// CP := &code_parser.CodeParser{}
+		// CP.FindDefinitions(code_parser.CodeBlob{}, "JS")
+		// filesFound := CP.FindFiles("../example", ".*\\.ts")
+		// fmt.Println(filesFound)
 	default:
 		fmt.Println(helpText)
 	}

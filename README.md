@@ -81,7 +81,7 @@ type CodeBlob struct{
 ## basic implementations lv 1
 ```go
     func (code CodeBlob)getJSDefinitions(){
-
+        
     }
 ```
 

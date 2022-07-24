@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -36,7 +37,7 @@ type FileFinder interface {
 }
 
 type DefinitionFinder interface{
-	FindDefinitions(code CodeBlob, regexPattern string) []Definition
+	FindDefinitions(code CodeBlob, regexPattern string, splitWordsFn func (string)[]string) []Definition
 }
 
 type WordSpliter interface  {
@@ -68,10 +69,11 @@ var FilePattern = map[string]string {
 }
 
 func (Search)FindFiles(dir string, regexPattern string) []string {
+	fmt.Println("From find files func")
 	var filePaths []string 
-	filepath.Walk("./example", func(path string, info fs.FileInfo, err error) error {
+	filepath.Walk(dir, func(path string, info fs.FileInfo, err error) error {
 			if err != nil {
-				log.Println(err)
+				log.Println("FindFiles error during Walk",err)
 				return err
 			}
 			filePaths = append(filePaths, path)
@@ -85,7 +87,7 @@ func (Search)FindFiles(dir string, regexPattern string) []string {
 	return jsFilePaths
 }
 
-func (Search)FindDefinitions(code CodeBlob, regexPattern string) []Definition{
+func (Search)FindDefinitions(code CodeBlob, regexPattern string, splitWordsFN func(name string)[]string) []Definition{
 	r := regexp.MustCompile(regexPattern)
 	captureGroups := r.FindAllStringSubmatch(code.blob, -1)
 	var definitions []Definition
@@ -99,6 +101,7 @@ func (Search)FindDefinitions(code CodeBlob, regexPattern string) []Definition{
 		definition := Definition{
 			name: variableName,
 			Origin: code.Origin,
+			words: splitWordsFN(variableName),
 		}
 
 		definitions = append(definitions, definition)
@@ -156,33 +159,32 @@ func (Split)SplitWords(variableName string, regexPattern string) []string{
 	return words
 }
 
-
-type Seaker struct{}
-func (CP CodeParser)ParseJS(codeBlob CodeBlob) []Definition {
-	definitions := CP.FindDefinitions(codeBlob, DeclarationPattern["JS"]);
-
-	for i, def := range definitions {
-		words := CP.SplitWords(def.name, CaseNewWordPattern["CAMEL_CASE"]);
-		definitions[i].words = append(definitions[i].words, words...) 
-	}
-
-	return definitions
-}
-
 var Toolbox = CodeParser{
 		DefinitionFinder: Search{},
+		FileFinder: Search{},
 		WordSpliter: Split{},
 	}
 
 
 // Bootstraping all together
-// func Parse(){
+func ParseJavaScript(dir string){
+	var definitions []Definition
+	filePaths := Toolbox.FindFiles(dir, FilePattern["TS"]);
 
-	
-// 	definitions := JS.ParseJS(CodeBlob{blob: "const TestVariable1("})
-// 	fmt.Println(definitions[0].words)
+	for _, filePath := range filePaths {
+		data, err := os.ReadFile(filePath)
+		if(err != nil){
+			fmt.Println(err)
+		}
+		def := Toolbox.FindDefinitions(CodeBlob{Origin: Origin{filePath: filePath}, blob: string(data) }, DeclarationPattern["JS"], func(name string) []string{
+			result := Toolbox.SplitWords(name, CaseNewWordPattern["CAMEL_CASE"])
+			return result
+		});
+		definitions = append(definitions, def...)
+	}
 
-// }
+	fmt.Println(definitions)
+}
 
 
 // utils
