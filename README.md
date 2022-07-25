@@ -12,7 +12,7 @@ https://github.com/dwyl/english-words
 for now only command you can run is on js file:
 
 ```bash
-./spellchecker js "./projectdir"
+./spellchecker.exe js "./example"
 ```
 
 
