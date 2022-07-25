@@ -27,7 +27,7 @@ type Origin struct{
 // Type Definition describes a single definition discovered in the code and possible words its made of. Definition is a word used to declare variable, function or key in a object
 type Definition struct {
     Origin;
-    name string;
+    Name string;
     Words []string;
 }
 
@@ -97,7 +97,7 @@ func (Search)FindDefinitions(code CodeBlob, regexPattern string, splitWordsFN fu
 	for _, group := range captureGroups {
 		variableName := group[2]
 		definition := Definition{
-			name: variableName,
+			Name: variableName,
 			Origin: code.Origin,
 			Words: splitWordsFN(variableName),
 		}

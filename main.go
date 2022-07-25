@@ -5,6 +5,7 @@ import (
 	"js_tools/spellchecker/code_parser"
 	"js_tools/spellchecker/dictionary"
 	"js_tools/spellchecker/model"
+	"js_tools/spellchecker/msg"
 	"os"
 )
 
@@ -35,8 +36,10 @@ func main() {
 		definitions := code_parser.ParseJavaScript(checkDirPath)
 		suggestions := dictionary.SuggestEnglish(definitions)
 		for _, sug := range suggestions {
-			fmt.Println(sug.IncorrectWords)
+			fmt.Println(sug.Definition)
 		}
+
+		msg.Inform(suggestions)
 		// CP := &code_parser.CodeParser{}
 		// CP.FindDefinitions(code_parser.CodeBlob{}, "JS")
 		// filesFound := CP.FindFiles("../example", ".*\\.ts")
