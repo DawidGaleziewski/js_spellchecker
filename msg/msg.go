@@ -26,7 +26,7 @@ func Chalk(word string, color string) string {
 }
 
 func Inform(suggestions []dictionary.Suggestion){
-	fmt.Println(Chalk("----------------", "red"),"\n Found potential spelling errors in: \n");
+	fmt.Println(Chalk("----------------", "red"),"\n Found potential spelling errors in: ");
 	for _, suggestion := range suggestions {
 		fmt.Println("# Definition: ", Chalk(suggestion.Name, "blue"), " for words:")
 
