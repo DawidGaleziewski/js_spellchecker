@@ -30,7 +30,7 @@ func Inform(suggestions []dictionary.Suggestion){
 	for _, suggestion := range suggestions {
 		fmt.Println("# Definition: ", Chalk(suggestion.Name, "blue"), " for words:")
 
-		for _, word := range suggestion.Words {
+		for _, word := range suggestion.IncorrectWords {
 			fmt.Println("- ", Chalk("\"" + word + "\"", "red"),)
 		}
 
