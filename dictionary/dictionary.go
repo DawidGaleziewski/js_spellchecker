@@ -1,9 +1,10 @@
 package dictionary
 
 import (
+	"embed"
+	_ "embed"
 	"js_tools/spellchecker/code_parser"
 	"log"
-	"os"
 	"regexp"
 )
 
@@ -37,10 +38,14 @@ type Suggestion struct {
 	IncorrectWords []string
 }
 
+//go:embed assets/eng_words.txt
+var f embed.FS 
+
 func SuggestEnglish(definitions []code_parser.Definition) []Suggestion {
 	var suggestions []Suggestion
 
-	data, err := os.ReadFile("./dictionary/assets/eng_words.txt");
+
+	data, err := f.ReadFile("assets/eng_words.txt");
 	if(err != nil){
 	   log.Println(err)
 	}

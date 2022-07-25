@@ -76,8 +76,6 @@ func (Search)FindFiles(dir string, regexPattern string) []string {
 				return err
 			}
 			filePaths = append(filePaths, path)
-			fmt.Println(path)
-			
 			return nil
 		})
 

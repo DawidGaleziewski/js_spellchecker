@@ -35,9 +35,6 @@ func main() {
 		checkDirPath := os.Args[2]
 		definitions := code_parser.ParseJavaScript(checkDirPath)
 		suggestions := dictionary.SuggestEnglish(definitions)
-		for _, sug := range suggestions {
-			fmt.Println(sug.Definition)
-		}
 
 		msg.Inform(suggestions)
 	default:
